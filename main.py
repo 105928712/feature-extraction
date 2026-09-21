@@ -37,13 +37,13 @@ import hashlib
 import base64
 import urllib.parse
 import urllib.request
-from features.scheme import Scheme
+import features
 
 def main():
-    url = "https://www.google.com"
-
-    scheme = Scheme(url)
-    print(scheme.value)
+    url = "https://sub.dom.ain.domain.vic.gov.au/path/to/page?param1=value1&param2=value2#fragment"
+    fl: dict = features.extract_features(url)
+    for feature_name, feature_value in fl.items():
+        print(f"{feature_name}: {feature_value}")
 
 if __name__ == "__main__":
     main()
