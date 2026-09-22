@@ -8,7 +8,7 @@ from .subdomain import HasWww, SubdomainCount, SubdomainLength, SubdomainMaxLabe
 from .tld import TLD
 from .utils import normalise_url
 
-FEATURES = [Scheme, Entropy, HostEntropy, PathEntropy, QueryEntropy, HasWww, SubdomainCount, SubdomainLength, SubdomainMaxLabelLength, SubdomainEntropy, SubdomainDigitRatio, SubdomainHyphenCount, SubdomainHasPunycode, SubdomainHasEmbeddedTLD]
+FEATURES = [Scheme, TLD, Entropy, HostEntropy, PathEntropy, QueryEntropy, HasWww, SubdomainCount, SubdomainLength, SubdomainMaxLabelLength, SubdomainEntropy, SubdomainDigitRatio, SubdomainHyphenCount, SubdomainHasPunycode, SubdomainHasEmbeddedTLD]
 
 def extract_features(url: str) -> dict:
     """Normalise a URL and run every feature on it."""
