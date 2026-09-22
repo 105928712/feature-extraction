@@ -27,3 +27,17 @@ class TLD(Feature):
         tld = psl.publicsuffix(host)
 
         return tld
+
+class TLDCount(Feature):
+    """Count the number of top-level domains (TLDs) within the URL."""
+
+    name = "tld_count"
+    description = "The number of top-level domains (TLDs) within the URL."
+
+    def extract(self, url:str) -> int:
+        parsed_url = urlparse(url)
+        host = parsed_url.hostname
+        tld = psl.publicsuffix(host)
+        
+        return len(tld.split('.'))
+        
