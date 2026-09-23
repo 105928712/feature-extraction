@@ -15,6 +15,8 @@ from .base import Feature
 from .utils import psl
 from urllib.parse import urlparse
 
+COMMON_ABUSED_TLDS = frozenset({"xyz", "top", "xin", "bond", "buzz", "sbs", "cfd", "lol", "ru", "cc", "shop", "online", "net", "cn", "monster", "world", "win", "support", "vip", "icu", "pro"})
+
 class TLD(Feature):
 
     name = "tld"
@@ -50,4 +52,16 @@ class TLDLength(Feature):
         tld = psl.publicsuffix(host)
 
         return len(tld)
+
+class TLDCommon(Feature):
+
+    name = "commonly_abused_tld"
+    description = "If the top-level domain is one that is commonly abused"
+
+    def extract(self, url:str) -> bool:
+        parsed_url = urlparse(url)
+        host = parsed_url.hostname
+        tld = psl.publicsuffix(host)
+
+        return any(label in COMMON_ABUSED_TLDS for label in tld.lower())
         
