@@ -15,7 +15,9 @@ from .base import Feature
 from .utils import psl
 from urllib.parse import urlparse
 
-COMMON_ABUSED_TLDS = frozenset({"xyz", "top", "xin", "bond", "buzz", "sbs", "cfd", "lol", "ru", "cc", "shop", "online", "net", "cn", "monster", "world", "win", "support", "vip", "icu", "pro"})
+COMMON_ABUSED_TLDS = frozenset({"xyz", "top", "xin", "bond", "buzz", "sbs", "cfd", "lol", "ru", "cc", "shop", "online", "cn", "monster", "world", "win", "support", "vip", "icu", "pro", "me", "gz", "ml", "tk"})
+
+COMMON_TLDS = frozenset({"com", "net", "org", "co"})
 
 class TLD(Feature):
 
@@ -53,15 +55,31 @@ class TLDLength(Feature):
 
         return len(tld)
 
-class TLDCommon(Feature):
+class TLDObscure(Feature):
 
-    name = "commonly_abused_tld"
-    description = "If the top-level domain is one that is commonly abused"
+    name = "tld_is_commonly_abused"
+    description = "If the top-level domain (TLD) is one that is commonly abused"
 
     def extract(self, url:str) -> bool:
         parsed_url = urlparse(url)
         host = parsed_url.hostname
         tld = psl.publicsuffix(host)
 
-        return any(label in COMMON_ABUSED_TLDS for label in tld.lower())
+        tld = [tld]
+        return any(label in COMMON_ABUSED_TLDS for label in tld)
+
+class TLDCommon(Feature):
+
+    name = "tld_is_common"
+    description = "If the top-level domain (TLD) is common"
+
+    def extract(self, url:str) -> bool:
+        parsed_url = urlparse(url)
+        host = parsed_url.hostname
+        tld = psl.publicsuffix(host)
+
+        tld = [tld]
+        return any(label in COMMON_TLDS for label in tld)
+
+        
         
