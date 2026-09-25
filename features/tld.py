@@ -2,15 +2,6 @@
 # 2026 Joey Manani & Anchorfish Team
 # TLD extractor
 
-# parsed_url = urlparse(url)
-# host = parsed_url.hostname
-# tld = psl.publicsuffix(host)
-
-# print("Subdomain:", subdomain)
-# print("Root Domain:", root_domain)
-# print("TLD:", tld)
-
-
 from .base import Feature
 from .utils import psl
 from urllib.parse import urlparse
