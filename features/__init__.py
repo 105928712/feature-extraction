@@ -6,10 +6,10 @@ from .entropy import Entropy, HostEntropy, PathEntropy, QueryEntropy
 from .scheme import Scheme
 from .subdomain import HasWww, SubdomainCount, SubdomainLength, SubdomainMaxLabelLength, SubdomainEntropy, SubdomainDigitRatio, SubdomainHyphenCount, SubdomainHasPunycode, SubdomainHasEmbeddedTLD
 from .tld import TLD, TLDCount, TLDLength
-from .rootdomain import RootDomain, RootDomainLength, HasHyphen, HyphenCount
+from .rootdomain import RootDomain, RootDomainLength, HasHyphen, HyphenCount, HasNumber
 from .utils import normalise_url
 
-FEATURES = [Scheme, Entropy, HostEntropy, PathEntropy, QueryEntropy, HasWww, SubdomainCount, SubdomainLength, SubdomainMaxLabelLength, SubdomainEntropy, SubdomainDigitRatio, SubdomainHyphenCount, SubdomainHasPunycode, SubdomainHasEmbeddedTLD, TLD, TLDCount, TLDLength, RootDomain, RootDomainLength, HasHyphen, HyphenCount]
+FEATURES = [Scheme, Entropy, HostEntropy, PathEntropy, QueryEntropy, HasWww, SubdomainCount, SubdomainLength, SubdomainMaxLabelLength, SubdomainEntropy, SubdomainDigitRatio, SubdomainHyphenCount, SubdomainHasPunycode, SubdomainHasEmbeddedTLD, TLD, TLDCount, TLDLength, RootDomain, RootDomainLength, HasHyphen, HyphenCount, HasNumber]
 
 def extract_features(url: str) -> dict:
     """Normalise a URL and run every feature on it."""
