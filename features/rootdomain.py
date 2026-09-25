@@ -37,9 +37,9 @@ class RootDomainLength(Feature):
         
         return len(root_domain)
 
-class HasHyphen(Feature):
+class RootDomainHasHyphen(Feature):
 
-    name = "Root_domain_has_hyphen"
+    name = "root_domain_has_hyphen"
     description = "Whether the Root Domain has hyphens."
 
     def extract(self, url: str) -> bool:
@@ -52,7 +52,7 @@ class HasHyphen(Feature):
             
             return "-" in root_domain
 
-class HyphenCount(Feature):
+class RootDomainHyphenCount(Feature):
 
     name = "root_domain_hyphen_count"
     description = "How many hyphens the Root Domain has."
@@ -67,7 +67,7 @@ class HyphenCount(Feature):
             
             return root_domain.count('-')
 
-class HasNumber(Feature):
+class RootDomainHasNumber(Feature):
 
     name = "root_domain_has_number"
     description = "Whether the Root Domain has numbers."
@@ -82,7 +82,7 @@ class HasNumber(Feature):
             
             return any(label.isdigit() for label in root_domain)
 
-class NumberCount(Feature):
+class RootDomainNumberCount(Feature):
 
     name = "root_domain_number_count"
     description = "How many numbers the Root Domain has."
