@@ -7,6 +7,7 @@ from .query import QueryLength, NumQueryComponents
 from .entropy import Entropy, HostEntropy, PathEntropy, QueryEntropy
 from .scheme import Scheme
 from .subdomain import HasWww, SubdomainCount, SubdomainLength, SubdomainMaxLabelLength, SubdomainEntropy, SubdomainDigitRatio, SubdomainHyphenCount, SubdomainHasPunycode, SubdomainHasEmbeddedTLD
+from .rootdomain import RootDomain, RootDomainLength, RootDomainHasHyphen, RootDomainHyphenCount, RootDomainHasNumber, RootDomainNumberCount, RootDomainEntropy
 from .tld import TLD, TLDCount, TLDLength, TLDObscure, TLDCommon
 from .utils import normalise_url
 from .sens_words import NumSensitiveWords
@@ -19,7 +20,6 @@ FEATURES = [
     TLD, TLDCount, TLDLength, TLDObscure, TLDCommon,
     NumSensitiveWords,
 ]
-
 
 def extract_features(url: str) -> dict:
     """Normalise a URL and run every feature on it."""
