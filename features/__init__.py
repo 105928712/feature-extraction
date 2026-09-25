@@ -19,6 +19,7 @@ FEATURES = [
     SubdomainDigitRatio, SubdomainHyphenCount, SubdomainHasPunycode, SubdomainHasEmbeddedTLD,
     TLD, TLDCount, TLDLength, TLDObscure, TLDCommon,
     NumSensitiveWords,
+    RootDomain, RootDomainLength, RootDomainHasHyphen, RootDomainHyphenCount, RootDomainHasNumber, RootDomainNumberCount, RootDomainEntropy
 ]
 
 def extract_features(url: str) -> dict:
