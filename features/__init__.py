@@ -11,6 +11,7 @@ from .rootdomain import RootDomain, RootDomainLength, RootDomainHasHyphen, RootD
 from .tld import TLD, TLDCount, TLDLength, TLDObscure, TLDCommon
 from .utils import normalise_url
 from .sens_words import NumSensitiveWords
+from .char import QuestionMarkCount, AmpersandCount, DotCount, SlashCount, HyphenCount, UnderscoreCount
 
 FEATURES = [
     Scheme, PathLevel, PathLength, DoubleSlashPath, QueryLength, NumQueryComponents,
@@ -19,7 +20,8 @@ FEATURES = [
     SubdomainDigitRatio, SubdomainHyphenCount, SubdomainHasPunycode, SubdomainHasEmbeddedTLD,
     TLD, TLDCount, TLDLength, TLDObscure, TLDCommon,
     NumSensitiveWords,
-    RootDomain, RootDomainLength, RootDomainHasHyphen, RootDomainHyphenCount, RootDomainHasNumber, RootDomainNumberCount, RootDomainEntropy
+    RootDomain, RootDomainLength, RootDomainHasHyphen, RootDomainHyphenCount, RootDomainHasNumber, RootDomainNumberCount, RootDomainEntropy,
+    QuestionMarkCount, AmpersandCount, DotCount, SlashCount, HyphenCount, UnderscoreCount,
 ]
 
 def extract_features(url: str) -> dict:
