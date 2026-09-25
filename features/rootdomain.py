@@ -80,4 +80,18 @@ class HasNumber(Feature):
             root_domain = parts[-1]
             
             return any(label.isdigit() for label in root_domain)
-    
+
+class NumberCount(Feature):
+
+    name = "root_domain_number_count"
+    description = "How many numbers the Root Domain has."
+
+    def extract(self, url: str) -> int:
+            parsed_url = urlparse(url)
+            host = parsed_url.hostname
+            tld = psl.publicsuffix(host)
+        
+            parts = host.rsplit("." + tld, 1)[0].split('.')
+            root_domain = parts[-1]
+            
+            return sum(label.isdigit() for label in root_domain)
