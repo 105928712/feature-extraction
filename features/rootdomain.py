@@ -4,6 +4,7 @@
 
 from .base import Feature
 from .utils import psl
+from .utils import shannon_entropy
 from urllib.parse import urlparse
 
 class RootDomain(Feature):
@@ -95,3 +96,18 @@ class NumberCount(Feature):
             root_domain = parts[-1]
             
             return sum(label.isdigit() for label in root_domain)
+
+class RootDomainEntropy(Feature):
+
+    name = "root_domain_entropy"
+    description = "The Shannon Entropy of the Root Domain."
+
+    def extract(self, url: str) -> float:
+            parsed_url = urlparse(url)
+            host = parsed_url.hostname
+            tld = psl.publicsuffix(host)
+        
+            parts = host.rsplit("." + tld, 1)[0].split('.')
+            root_domain = parts[-1]
+            
+            return shannon_entropy(root_domain)
