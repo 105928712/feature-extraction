@@ -39,7 +39,7 @@ class RootDomainLength(Feature):
 class HasHyphen(Feature):
 
     name = "has_hyphen"
-    description = "Whether the Root Domain has a hyphen"
+    description = "Whether the Root Domain has a hyphen."
 
     def extract(self, url: str) -> bool:
             parsed_url = urlparse(url)
@@ -50,3 +50,18 @@ class HasHyphen(Feature):
             root_domain = parts[-1]
             
             return "-" in root_domain
+
+class HyphenCount(Feature):
+
+    name = "hyphen_count"
+    description = "How many hyphens the Root Domain has."
+
+    def extract(self, url: str) -> int:
+            parsed_url = urlparse(url)
+            host = parsed_url.hostname
+            tld = psl.publicsuffix(host)
+        
+            parts = host.rsplit("." + tld, 1)[0].split('.')
+            root_domain = parts[-1]
+            
+            return root_domain.count('-')
