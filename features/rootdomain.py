@@ -27,7 +27,7 @@ class RootDomainLength(Feature):
     name = "root_domain_length"
     description = "The length of the Root Domain"
 
-    def extract(self, url: str) -> str:
+    def extract(self, url: str) -> int:
         parsed_url = urlparse(url)
         host = parsed_url.hostname
         tld = psl.publicsuffix(host)
