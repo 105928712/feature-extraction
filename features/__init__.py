@@ -11,7 +11,11 @@ from .rootdomain import RootDomain, RootDomainLength, RootDomainHasHyphen, RootD
 from .tld import TLD, TLDCount, TLDLength, TLDObscure, TLDCommon
 from .utils import normalise_url
 from .sens_words import NumSensitiveWords
-from .char import QuestionMarkCount, AmpersandCount, DotCount, SlashCount, HyphenCount, UnderscoreCount
+from .char import QuestionMarkCount, AmpersandCount, DotCount, SlashCount, HyphenCount, UnderscoreCount, UrlLength, DigitRatio, SpecialCharRatio, HashCount, PercentCount, TildeCount, AtCount
+from .host import HasAtSymbol, IsIPHost, HasNonStandardPort, HttpsInHostname, DomainHasPunycode
+from .brand import BrandEditDistance
+from .shortener import IsKnownShortener
+from .wordstats import LongestWordLength, AvgWordLength
 
 FEATURES = [
     Scheme, PathLevel, PathLength, DoubleSlashPath, QueryLength, NumQueryComponents,
@@ -21,7 +25,11 @@ FEATURES = [
     TLD, TLDCount, TLDLength, TLDObscure, TLDCommon,
     NumSensitiveWords,
     RootDomain, RootDomainLength, RootDomainHasHyphen, RootDomainHyphenCount, RootDomainHasNumber, RootDomainNumberCount, RootDomainEntropy,
-    QuestionMarkCount, AmpersandCount, DotCount, SlashCount, HyphenCount, UnderscoreCount,
+    QuestionMarkCount, AmpersandCount, DotCount, SlashCount, HyphenCount, UnderscoreCount, UrlLength, DigitRatio, SpecialCharRatio, HashCount, PercentCount, TildeCount, AtCount,
+    HasAtSymbol, IsIPHost, HasNonStandardPort, HttpsInHostname, DomainHasPunycode,
+    BrandEditDistance,
+    IsKnownShortener,
+    LongestWordLength, AvgWordLength,
 ]
 
 def extract_features(url: str) -> dict:
