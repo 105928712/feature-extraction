@@ -48,6 +48,30 @@ class UnderscoreCount(CharCountFeature):
     description = "The number of underscores in the URL."
     char = "_"
 
+class HashCount(CharCountFeature):
+    """Extract the number of hashes in the URL."""
+    name = "hash_count"
+    description = "The number of hashes in the URL."
+    char = "#"
+
+class PercentCount(CharCountFeature):
+    """Extract the number of percent signs in the URL."""
+    name = "percent_count"
+    description = "The number of percent signs in the URL."
+    char = "%"
+
+class TildeCount(CharCountFeature):
+    """Extract the number of tildes in the URL."""
+    name = "tilde_count"
+    description = "The number of tildes in the URL."
+    char = "~"
+
+class AtCount(CharCountFeature):
+    """Extract the number of at symbols in the URL."""
+    name = "at_count"
+    description = "The number of at symbols in the URL."
+    char = "@"
+
 class UrlLength(Feature):
     name = "url_length"
     description = "Total character length of the URL."
