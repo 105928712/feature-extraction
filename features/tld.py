@@ -3,12 +3,13 @@
 # TLD extractor
 
 from .base import Feature
-from .utils import psl
-from urllib.parse import urlparse
+from .utils import get_tld
 
 COMMON_ABUSED_TLDS = frozenset({"xyz", "top", "xin", "bond", "buzz", "sbs", "cfd", "lol", "ru", "cc", "shop", "online", "cn", "monster", "world", "win", "support", "vip", "icu", "pro", "me", "gz", "ml", "tk"})
 
 COMMON_TLDS = frozenset({"com", "net", "org", "co"})
+
+# get_tld returns "" for IP hosts and unparseable hosts, so every feature below is safe on bad input
 
 class TLD(Feature):
 
@@ -16,11 +17,7 @@ class TLD(Feature):
     description = "The top-level domain (TLD) of the URL."
 
     def extract(self, url: str) -> str:
-        parsed_url = urlparse(url)
-        host = parsed_url.hostname
-        tld = psl.publicsuffix(host)
-
-        return tld
+        return get_tld(url)
 
 class TLDCount(Feature):
 
@@ -28,11 +25,8 @@ class TLDCount(Feature):
     description = "The number of top-level domains (TLDs) within the URL."
 
     def extract(self, url:str) -> int:
-        parsed_url = urlparse(url)
-        host = parsed_url.hostname
-        tld = psl.publicsuffix(host)
-        
-        return len(tld.split('.'))
+        tld = get_tld(url)
+        return len(tld.split('.')) if tld else 0
 
 class TLDLength(Feature):
 
@@ -40,11 +34,7 @@ class TLDLength(Feature):
     description = "Character length of the top-level domain (TLD)."
 
     def extract(self, url:str) -> int:
-        parsed_url = urlparse(url)
-        host = parsed_url.hostname
-        tld = psl.publicsuffix(host)
-
-        return len(tld)
+        return len(get_tld(url))
 
 class TLDObscure(Feature):
 
@@ -52,12 +42,7 @@ class TLDObscure(Feature):
     description = "If the top-level domain (TLD) is one that is commonly abused"
 
     def extract(self, url:str) -> bool:
-        parsed_url = urlparse(url)
-        host = parsed_url.hostname
-        tld = psl.publicsuffix(host)
-
-        tld = [tld]
-        return any(label in COMMON_ABUSED_TLDS for label in tld)
+        return get_tld(url) in COMMON_ABUSED_TLDS
 
 class TLDCommon(Feature):
 
@@ -65,12 +50,4 @@ class TLDCommon(Feature):
     description = "If the top-level domain (TLD) is common"
 
     def extract(self, url:str) -> bool:
-        parsed_url = urlparse(url)
-        host = parsed_url.hostname
-        tld = psl.publicsuffix(host)
-
-        tld = [tld]
-        return any(label in COMMON_TLDS for label in tld)
-
-        
-        
+        return get_tld(url) in COMMON_TLDS
