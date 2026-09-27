@@ -5,7 +5,7 @@
 from Levenshtein import distance as levenshtein
 
 from .base import Feature
-from .utils import get_host, psl
+from .utils import get_root_label
 
 COMMON_BRANDS = frozenset({
     "paypal", "apple", "microsoft", "google", "amazon", "facebook",
@@ -15,22 +15,11 @@ COMMON_BRANDS = frozenset({
 })
 
 
-def _root_label(url: str) -> str:
-    host = get_host(url)
-    if not host:
-        return ""
-    registrable = psl.privatesuffix(host)
-    if not registrable:
-        return host
-    tld = psl.publicsuffix(host)
-    return registrable.rsplit("." + tld, 1)[0] if tld else registrable
-
-
 class BrandEditDistance(Feature):
     """How close the root domain is to a known brand name - low distance + wrong domain = typosquatting."""
     name = "brand_edit_distance"
     description = "Smallest edit distance between the root domain and a list of commonly impersonated brand names."
 
     def extract(self, url: str) -> int:
-        root = _root_label(url)
+        root = get_root_label(url)
         return min(levenshtein(root, brand) for brand in COMMON_BRANDS)
