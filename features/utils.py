@@ -13,14 +13,47 @@ from publicsuffixlist import PublicSuffixList
 
 psl = PublicSuffixList(only_icann=True)  # ignore private suffixes (github.io etc.)
 WWW_LABEL = re.compile(r"www\d*")        # www, www1, www2...
+WWW_PREFIX = re.compile(r"^www\d*\.", re.IGNORECASE)
+SCHEME = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*://")  # http://, https://, hxxp://...
 
 
 def normalise_url(url: str) -> str:
-    """Strip whitespace and add http:// if the URL has no scheme."""
+    """Strip whitespace and add http:// if the URL doesn't start with a scheme."""
     url = url.strip()
-    if "://" not in url:
+    # anchored match: "site.com/?next=http://x" has "://" in it but still no scheme of its own
+    if not SCHEME.match(url):
         url = "http://" + url
     return url
+
+
+def canonical_url(url: str) -> str:
+    """Write every source's URLs the same way: no scheme, no leading www., no trailing /
+
+    https://www.example.com/ -> example.com, but http://a.com/x/ -> a.com/x/ (that slash is part of the path).
+    
+    
+    Dataset benign URLs have no scheme or www. while malicious ones often do;
+    the model could learn which dataset a URL came from instead of
+    whether it is phishing or not. big bias fix
+    """
+    url = SCHEME.sub("", url.strip(), count=1)
+    labels = get_subdomain_labels("http://" + url)
+    # only strip www when it is a subdomain ("www.com" is a real domain and stays as it is)
+    if labels and WWW_LABEL.fullmatch(labels[0]):
+        url = WWW_PREFIX.sub("", url, count=1)
+    parts = split_url("http://" + url)
+    if url.endswith("/") and parts and parts.path == "/" and not parts.query and not parts.fragment:
+        url = url[:-1]
+    return url
+
+
+@lru_cache(maxsize=1024)
+def split_url(url: str):
+    """urlsplit that returns None instead of raising on malformed URLs (e.g. "http://[::1")."""
+    try:
+        return urlsplit(url)
+    except ValueError:
+        return None
 
 
 def shannon_entropy(data: str) -> float:
