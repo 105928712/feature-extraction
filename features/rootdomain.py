@@ -3,9 +3,9 @@
 # Root Domain extractor
 
 from .base import Feature
-from .utils import psl
-from .utils import shannon_entropy
-from urllib.parse import urlparse
+from .utils import get_root_label, shannon_entropy
+
+# get_root_label returns "" for IP hosts and unparseable hosts, so every feature below is safe on bad input
 
 class RootDomain(Feature):
 
@@ -13,14 +13,7 @@ class RootDomain(Feature):
     description = "The Root Domain of the URL."
 
     def extract(self, url: str) -> str:
-        parsed_url = urlparse(url)
-        host = parsed_url.hostname
-        tld = psl.publicsuffix(host)
-
-        parts = host.rsplit("." + tld, 1)[0].split('.')
-        root_domain = parts[-1]
-    
-        return root_domain
+        return get_root_label(url)
 
 class RootDomainLength(Feature):
 
@@ -28,14 +21,7 @@ class RootDomainLength(Feature):
     description = "The length of the Root Domain"
 
     def extract(self, url: str) -> int:
-        parsed_url = urlparse(url)
-        host = parsed_url.hostname
-        tld = psl.publicsuffix(host)
-    
-        parts = host.rsplit("." + tld, 1)[0].split('.')
-        root_domain = parts[-1]
-        
-        return len(root_domain)
+        return len(get_root_label(url))
 
 class RootDomainHasHyphen(Feature):
 
@@ -43,14 +29,7 @@ class RootDomainHasHyphen(Feature):
     description = "Whether the Root Domain has hyphens."
 
     def extract(self, url: str) -> bool:
-            parsed_url = urlparse(url)
-            host = parsed_url.hostname
-            tld = psl.publicsuffix(host)
-        
-            parts = host.rsplit("." + tld, 1)[0].split('.')
-            root_domain = parts[-1]
-            
-            return "-" in root_domain
+        return "-" in get_root_label(url)
 
 class RootDomainHyphenCount(Feature):
 
@@ -58,14 +37,7 @@ class RootDomainHyphenCount(Feature):
     description = "How many hyphens the Root Domain has."
 
     def extract(self, url: str) -> int:
-            parsed_url = urlparse(url)
-            host = parsed_url.hostname
-            tld = psl.publicsuffix(host)
-        
-            parts = host.rsplit("." + tld, 1)[0].split('.')
-            root_domain = parts[-1]
-            
-            return root_domain.count('-')
+        return get_root_label(url).count('-')
 
 class RootDomainHasNumber(Feature):
 
@@ -73,14 +45,7 @@ class RootDomainHasNumber(Feature):
     description = "Whether the Root Domain has numbers."
 
     def extract(self, url: str) -> bool:
-            parsed_url = urlparse(url)
-            host = parsed_url.hostname
-            tld = psl.publicsuffix(host)
-        
-            parts = host.rsplit("." + tld, 1)[0].split('.')
-            root_domain = parts[-1]
-            
-            return any(label.isdigit() for label in root_domain)
+        return any(char.isdigit() for char in get_root_label(url))
 
 class RootDomainNumberCount(Feature):
 
@@ -88,14 +53,7 @@ class RootDomainNumberCount(Feature):
     description = "How many numbers the Root Domain has."
 
     def extract(self, url: str) -> int:
-            parsed_url = urlparse(url)
-            host = parsed_url.hostname
-            tld = psl.publicsuffix(host)
-        
-            parts = host.rsplit("." + tld, 1)[0].split('.')
-            root_domain = parts[-1]
-            
-            return sum(label.isdigit() for label in root_domain)
+        return sum(char.isdigit() for char in get_root_label(url))
 
 class RootDomainEntropy(Feature):
 
@@ -103,11 +61,4 @@ class RootDomainEntropy(Feature):
     description = "The Shannon Entropy of the Root Domain."
 
     def extract(self, url: str) -> float:
-            parsed_url = urlparse(url)
-            host = parsed_url.hostname
-            tld = psl.publicsuffix(host)
-        
-            parts = host.rsplit("." + tld, 1)[0].split('.')
-            root_domain = parts[-1]
-            
-            return shannon_entropy(root_domain)
+        return shannon_entropy(get_root_label(url))

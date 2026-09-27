@@ -65,4 +65,21 @@ def get_subdomain_labels(url: str) -> tuple:
     registrable = psl.privatesuffix(host)
     if not registrable or registrable == host:
         return ()
-    return tuple[str, ...](host[: -len(registrable) - 1].split(".")) 
+    return tuple[str, ...](host[: -len(registrable) - 1].split("."))
+
+
+@lru_cache(maxsize=1024)
+def get_tld(url: str) -> str:
+    """Public suffix of the host, e.g. 'co.uk'. Empty for IP hosts and hosts that can't be parsed."""
+    host = get_host(url)
+    if not host or is_ip(host):
+        return ""
+    return psl.publicsuffix(host) or ""  # None for broken hosts like "a..b.com"
+
+
+@lru_cache(maxsize=1024)
+def get_root_label(url: str) -> str:
+    """Registrable name without its suffix, e.g. 'example' for login.example.co.uk."""
+    tld = get_tld(url)
+    registrable = psl.privatesuffix(get_host(url)) if tld else None
+    return registrable[: -len(tld) - 1] if registrable else ""
