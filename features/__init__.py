@@ -18,9 +18,9 @@ from .shortener import IsKnownShortener
 from .wordstats import LongestWordLength, AvgWordLength
 
 FEATURES = [
-    Scheme, PathLevel, PathLength, DoubleSlashPath, QueryLength, NumQueryComponents,
+    PathLevel, PathLength, DoubleSlashPath, QueryLength, NumQueryComponents,
     Entropy, HostEntropy, PathEntropy, QueryEntropy,
-    HasWww, SubdomainCount, SubdomainLength, SubdomainMaxLabelLength, SubdomainEntropy,
+    SubdomainCount, SubdomainLength, SubdomainMaxLabelLength, SubdomainEntropy,
     SubdomainDigitRatio, SubdomainHyphenCount, SubdomainHasPunycode, SubdomainHasEmbeddedTLD,
     TLD, TLDCount, TLDLength, TLDObscure, TLDCommon,
     NumSensitiveWords,
@@ -31,6 +31,9 @@ FEATURES = [
     IsKnownShortener,
     LongestWordLength, AvgWordLength,
 ]
+
+# scheme and haswww are REMOVED because canonical_url strips the scheme and www (normalising adds http://)
+# therefore ALL phishing and legits lack a www and a https scheme and all look the same, so they are now normal
 
 def extract_features(url: str) -> dict:
     """Normalise a URL and run every feature on it."""
