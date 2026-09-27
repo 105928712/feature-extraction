@@ -25,6 +25,26 @@ def normalise_url(url: str) -> str:
         url = "http://" + url
     return url
 
+def is_readable(url):
+    """Check if a URL is readable and normal"""
+    url = url.strip()
+    if url == "":
+        return False
+    if not url.isprintable():
+        return False
+    for char in url:
+        if char.isspace():
+            return False
+
+    full_url = normalise_url(url)
+    host = get_host(full_url)
+    if not host:
+        return False
+    if is_ip(host):
+        return True
+    if get_tld(full_url):
+        return True
+    return False
 
 def canonical_url(url: str) -> str:
     """Write every source's URLs the same way: no scheme, no leading www., no trailing /
