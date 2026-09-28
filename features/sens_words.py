@@ -11,6 +11,7 @@ SENSITIVE_WORDS = frozenset({ #list of common sensitive words from various datas
     "banking",
     "bank",
     "login",
+    "autologin"
     "confirm",
     "sign-in",
     "signin",
@@ -39,8 +40,6 @@ class NumSensitiveWords(Feature):
         for word in SENSITIVE_WORDS:
             if word in url_lower:
                 count += 1
-
-
 
         return count
 
