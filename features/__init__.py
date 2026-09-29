@@ -16,6 +16,7 @@ from .host import HasAtSymbol, IsIPHost, HasNonStandardPort, HttpsInHostname, Do
 from .brand import BrandEditDistance
 from .shortener import IsKnownShortener
 from .wordstats import LongestWordLength, AvgWordLength
+from .file_ext import HasMaliciousFileExtension
 
 FEATURES = [
     PathLevel, PathLength, DoubleSlashPath, QueryLength, NumQueryComponents,
@@ -30,6 +31,7 @@ FEATURES = [
     BrandEditDistance,
     IsKnownShortener,
     LongestWordLength, AvgWordLength,
+    HasMaliciousFileExtension
 ]
 
 # scheme and haswww are REMOVED because canonical_url strips the scheme and www (normalising adds http://)
