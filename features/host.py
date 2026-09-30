@@ -54,3 +54,11 @@ class DomainHasPunycode(Feature):
     def extract(self, url: str) -> bool:
         host = get_host(url)
         return any(label.startswith("xn--") for label in host.split("."))
+
+class HostLength(Feature):
+
+    name = "host_length"
+    description = "The length of the host"
+
+    def extract(self, url: str) -> int:
+        return len(get_host(url))

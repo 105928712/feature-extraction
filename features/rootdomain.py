@@ -62,3 +62,18 @@ class RootDomainEntropy(Feature):
 
     def extract(self, url: str) -> float:
         return shannon_entropy(get_root_label(url))
+
+class RootDomainHasPunycode(Feature):
+    name = "root_domain_has_punycode"
+    description = "Whether the Root Domain label is punycode (xn--)."
+
+    def extract(self, url: str) -> bool:
+        return any(label.startswith("xn--") for label in get_root_label(url))
+
+class RootDomainDigitRatio(Feature):
+    name = "root_domain_digit_ratio"
+    description = "Fraction of Root Domain characters that are digits."
+
+    def extract(self, url: str) -> float:
+        sub = "".join(get_root_label(url))
+        return sum(c.isdigit() for c in sub) / len(sub) if sub else 0.0
