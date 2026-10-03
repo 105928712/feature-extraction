@@ -6,7 +6,7 @@
 import unittest
 
 import features
-from features.utils import canonical_url
+from features.utils import canonical_url, is_readable
 
 BAD_URLS = [
     "http://",                                                         # missing host
@@ -63,6 +63,26 @@ class CanonicalUrl(unittest.TestCase):
         self.assertEqual(canonical_url("https://www.example.com/"), "example.com")
         self.assertEqual(canonical_url("WWW2.a.com/x"), "a.com/x")
 
+    def test_undoes_source_storage_quirks(self):
+        # \% and \' escapes, and &amp; copied out of HTML
+        self.assertEqual(canonical_url("'www.x.com/BUYER\\'S\\%20GUIDE.pdf'"), "x.com/BUYER'S%20GUIDE.pdf")
+        self.assertEqual(canonical_url("a.com/login.php?cmd=1&amp;id=2"), "a.com/login.php?cmd=1&id=2")
+        self.assertEqual(canonical_url("a.com/?keepThis=true&amp;amp;TB=1"), "a.com/?keepThis=true&TB=1")
+        self.assertEqual(canonical_url("a.com/?x=1&copy=2"), "a.com/?x=1&copy=2")  # not an entity, leave it
+
+
+class IsReadable(unittest.TestCase):
+
+    def test_real_urls_pass(self):
+        for url in ["cn.ca", "http://43.156.237.181/v3/signin", "login.example.co.uk/a", "зачемвыэтопереводите.рф/вход"]:
+            with self.subTest(url=url):
+                self.assertTrue(is_readable(url))
+
+    def test_junk_fails(self):
+        # the first three are real rows from malicious_phish.csv that used to pass
+        for url in ["WY", "ºE", "¾5092", "foo.notarealtld", "localhost", "", "a b.com"]:
+            with self.subTest(url=url):
+                self.assertFalse(is_readable(url))
 
 if __name__ == "__main__":
     unittest.main()

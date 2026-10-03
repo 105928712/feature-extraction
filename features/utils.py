@@ -15,6 +15,7 @@ psl = PublicSuffixList(only_icann=True)  # ignore private suffixes (github.io et
 WWW_LABEL = re.compile(r"www\d*")        # www, www1, www2...
 WWW_PREFIX = re.compile(r"^www\d*\.", re.IGNORECASE)
 SCHEME = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*://")  # http://, https://, hxxp://...
+ESCAPED = re.compile(r"\\([%'])")        # \% and \' -> % and '
 
 
 def normalise_url(url: str) -> str:
@@ -42,7 +43,7 @@ def is_readable(url):
         return False
     if is_ip(host):
         return True
-    if get_tld(full_url):
+    if psl.publicsuffix(host, accept_unknown=False):
         return True
     return False
 
@@ -55,8 +56,20 @@ def canonical_url(url: str) -> str:
     Dataset benign URLs have no scheme or www. while malicious ones often do;
     the model could learn which dataset a URL came from instead of
     whether it is phishing or not. big bias fix
+
+    Same idea for how a source stored its URLs: one wrapped them in '...' and escaped % as \\%,
+    others copied & out of HTML as &amp;. Neither is part of the real URL. Just storage quirk
     """
-    url = SCHEME.sub("", url.strip(), count=1)
+    url = url.strip()
+    if len(url) >= 2 and (url[0] == url[-1] == "'"): # check first char = last char = ' (quote wrap check)
+        url = url[1:-1]
+
+    # only &amp; html.unescape would also turn real query params like "&copy=2" into "©=2" - we dont want this
+    url = ESCAPED.sub(r"\1", url)
+    while "&amp;" in url:  # some were escaped twice (&amp;amp;)
+        url = url.replace("&amp;", "&");
+
+    url = SCHEME.sub("", url, count=1)
     labels = get_subdomain_labels("http://" + url)
     # only strip www when it is a subdomain ("www.com" is a real domain and stays as it is)
     if labels and WWW_LABEL.fullmatch(labels[0]):
