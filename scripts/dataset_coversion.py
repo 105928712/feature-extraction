@@ -21,13 +21,17 @@ BENIGN_LABELS = [
     "benign",
     "safe",
     "0",
+    "0.0",
 ]
 
 PHISHING_LABELS = [
     "phishing",
     "malicious",
     "dangerous",
+    "1.0",
     "1",
+    "defacement",
+    "malware",
 ]
 
 
@@ -53,6 +57,7 @@ def clean_csv(input_file):
             input_file,
             "r",
             encoding="utf-8-sig",
+            errors="replace",
             newline=""
         )
         reader = csv.DictReader(infile)
@@ -64,6 +69,7 @@ def clean_csv(input_file):
             input_file,
             "r",
             encoding="cp1252",
+            errors="replace",
             newline=""
         )
         reader = csv.DictReader(infile)
@@ -104,8 +110,8 @@ def clean_csv(input_file):
 
     for row in reader:
 
-        url = row.get(url_header, "").strip()
-        label = row.get(label_header, "").strip().lower()
+        url = (row.get(url_header) or "").strip()
+        label = (row.get(label_header) or "").strip().lower()
 
 
         # Convert labels
@@ -161,9 +167,7 @@ all_rows = []
 for i in range(number_of_files):
 
     print()
-    file_path = input(
-        f"Enter path for CSV {i + 1}: "
-    ).strip()
+    file_path = input(f"Enter path for CSV {i + 1}: ").strip().strip('"')
 
     if not os.path.isfile(file_path):
         print("ERROR: File not found:", file_path)
@@ -177,18 +181,16 @@ for i in range(number_of_files):
 
 # WRITE MERGED DATASET
 
-output_file = input(
-    "Enter the name for the merged CSV "
-    "(example: merged_dataset.csv): "
-).strip()
+output_file = os.path.join(
+    os.path.expanduser("~"),
+    "Downloads",
+    "merged_dataset.csv"
+)
 
-
-with open(
-    output_file,
-    "w",
-    encoding="utf-8",
-    newline=""
-) as outfile:
+with open(output_file, "w", encoding="utf-8", newline="") as outfile:
+    writer = csv.DictWriter(outfile, fieldnames=["url", "type"])
+    writer.writeheader()
+    writer.writerows(all_rows)
 
     writer = csv.DictWriter(
         outfile,
