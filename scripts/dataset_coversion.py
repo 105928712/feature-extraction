@@ -2,9 +2,10 @@ import csv
 import os
 
 
-
+# ============================================================
 # CONFIGURATION
-
+# Add new possible headers here when needed
+# ============================================================
 
 URL_HEADERS = [
     "url",
@@ -17,166 +18,177 @@ LABEL_HEADERS = [
 ]
 
 
-
-# LABEL CONVERSION
-
-
 BENIGN_LABELS = [
     "legitimate",
     "benign",
+    "safe",
     "0",
 ]
 
 PHISHING_LABELS = [
     "phishing",
     "malicious",
+    "dangerous",
     "1",
 ]
 
 
+# ============================================================
+# FIND A HEADER
+# ============================================================
 
-# CLEAN DATASET
+def find_header(headers, accepted_headers):
 
+    for header in headers:
+        if header.strip().lower() in accepted_headers:
+            return header
 
-input_file = input("Enter the path to the CSV file: ").strip()
-
-if not os.path.isfile(input_file):
-    print("Error: File not found.")
-    exit()
-
-
-# Create output filename
-name, extension = os.path.splitext(input_file)
-output_file = name + "_cleaned" + extension
+    return None
 
 
+# ============================================================
+# CLEAN ONE CSV
+# ============================================================
 
-# Read CSV
+def clean_csv(input_file):
 
-
-try:
-    with open(input_file, "r", encoding="utf-8-sig", newline="") as infile:
+    # Try UTF-8 first
+    try:
+        infile = open(
+            input_file,
+            "r",
+            encoding="utf-8-sig",
+            newline=""
+        )
         reader = csv.DictReader(infile)
 
-        if reader.fieldnames is None:
-            print("Error: Could not find CSV headers.")
-            exit()
+        headers = reader.fieldnames
 
-        # Remove spaces and make headers lowercase
-        headers = [header.strip().lower() for header in reader.fieldnames]
-
-except UnicodeDecodeError:
-    print("UTF-8 encoding failed. Trying Windows-1252...")
-
-    with open(input_file, "r", encoding="cp1252", newline="") as infile:
+    except UnicodeDecodeError:
+        infile = open(
+            input_file,
+            "r",
+            encoding="cp1252",
+            newline=""
+        )
         reader = csv.DictReader(infile)
 
-        if reader.fieldnames is None:
-            print("Error: Could not find CSV headers.")
-            exit()
-
-        headers = [header.strip().lower() for header in reader.fieldnames]
+        headers = reader.fieldnames
 
 
-
-# FIND URL COLUMN
-
-
-url_header = None
-
-for header in headers:
-    if header in URL_HEADERS:
-        url_header = header
-        break
+    if headers is None:
+        print("ERROR: No headers found in:", input_file)
+        infile.close()
+        return []
 
 
-
-# FIND LABEL COLUMN
-
-
-label_header = None
-
-for header in headers:
-    if header in LABEL_HEADERS:
-        label_header = header
-        break
+    # Find URL and label columns
+    url_header = find_header(headers, URL_HEADERS)
+    label_header = find_header(headers, LABEL_HEADERS)
 
 
-# CHECK THAT BOTH COLUMNS WERE FOUND
+    if url_header is None:
+        print("ERROR: No URL/domain column found in:", input_file)
+        infile.close()
+        return []
 
 
-if url_header is None:
-    print("Error: Could not find a URL/domain column.")
-    print("Accepted headers:", URL_HEADERS)
-    exit()
-
-if label_header is None:
-    print("Error: Could not find a type/label column.")
-    print("Accepted headers:", LABEL_HEADERS)
-    exit()
+    if label_header is None:
+        print("ERROR: No type/label column found in:", input_file)
+        infile.close()
+        return []
 
 
-print("URL column found:", url_header)
-print("Label column found:", label_header)
+    print("Processing:", input_file)
+    print("  URL column:", url_header)
+    print("  Label column:", label_header)
 
 
-
-# RE-READ FILE WITH THE CORRECT ENCODING
-
-
-try:
-    infile = open(
-        input_file,
-        "r",
-        encoding="utf-8-sig",
-        newline=""
-    )
-    reader = csv.DictReader(infile)
-
-except UnicodeDecodeError:
-    infile = open(
-        input_file,
-        "r",
-        encoding="cp1252",
-        newline=""
-    )
-    reader = csv.DictReader(infile)
+    cleaned_rows = []
 
 
+    for row in reader:
 
-# PROCESS DATA
+        url = row.get(url_header, "").strip()
+        label = row.get(label_header, "").strip().lower()
 
 
-cleaned_rows = []
+        # Convert labels
+        if label in BENIGN_LABELS:
+            label = "benign"
 
-for row in reader:
+        elif label in PHISHING_LABELS:
+            label = "phishing"
 
-    url = row.get(url_header, "").strip()
-    label = row.get(label_header, "").strip().lower()
+        else:
+            print("  WARNING: Unknown label:", label)
+            continue
 
-    # Convert labels to standard format
-    if label in BENIGN_LABELS:
-        label = "benign"
 
-    elif label in PHISHING_LABELS:
-        label = "phishing"
+        # Ignore empty URLs
+        if url == "":
+            continue
 
-    else:
-        print("Warning: Unknown label:", row.get(label_header))
+
+        # Only keep the standard columns
+        cleaned_rows.append({
+            "url": url,
+            "type": label
+        })
+
+
+    infile.close()
+
+    print("  Rows kept:", len(cleaned_rows))
+    print()
+
+    return cleaned_rows
+
+
+# ============================================================
+# MAIN PROGRAM
+# ============================================================
+
+print("======================================")
+print(" URL DATASET CLEANER AND MERGER")
+print("======================================")
+print()
+
+
+# Ask how many files
+number_of_files = int(
+    input("How many CSV files do you want to merge? ")
+)
+
+
+all_rows = []
+
+
+# Get each CSV
+for i in range(number_of_files):
+
+    print()
+    file_path = input(
+        f"Enter path for CSV {i + 1}: "
+    ).strip()
+
+    if not os.path.isfile(file_path):
+        print("ERROR: File not found:", file_path)
         continue
 
-    # Keep ONLY URL and type
-    cleaned_rows.append({
-        "url": url,
-        "type": label
-    })
+    rows = clean_csv(file_path)
+
+    all_rows.extend(rows)
 
 
-infile.close()
+# ============================================================
+# WRITE MERGED DATASET
+# ============================================================
 
-
-
-# WRITE CLEANED CSV
+output_file = input(
+    "Enter the name for the merged CSV "
+    "(example: merged_dataset.csv): "
+).strip()
 
 
 with open(
@@ -192,15 +204,31 @@ with open(
     )
 
     writer.writeheader()
-    writer.writerows(cleaned_rows)
+    writer.writerows(all_rows)
 
 
+# ============================================================
+# SUMMARY
+# ============================================================
 
-# FINISHED
+benign_count = 0
+phishing_count = 0
+
+
+for row in all_rows:
+
+    if row["type"] == "benign":
+        benign_count += 1
+
+    elif row["type"] == "phishing":
+        phishing_count += 1
 
 
 print()
-print("Cleaning complete!")
-print("Original file:", input_file)
-print("Cleaned file:", output_file)
-print("Rows kept:", len(cleaned_rows))
+print("======================================")
+print(" MERGE COMPLETE")
+print("======================================")
+print("Total rows:", len(all_rows))
+print("Benign:", benign_count)
+print("Phishing:", phishing_count)
+print("Output:", output_file)
