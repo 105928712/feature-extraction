@@ -2,10 +2,8 @@ import csv
 import os
 
 
-# ============================================================
 # CONFIGURATION
 # Add new possible headers here when needed
-# ============================================================
 
 URL_HEADERS = [
     "url",
@@ -33,9 +31,8 @@ PHISHING_LABELS = [
 ]
 
 
-# ============================================================
 # FIND A HEADER
-# ============================================================
+
 
 def find_header(headers, accepted_headers):
 
@@ -46,9 +43,7 @@ def find_header(headers, accepted_headers):
     return None
 
 
-# ============================================================
 # CLEAN ONE CSV
-# ============================================================
 
 def clean_csv(input_file):
 
@@ -145,9 +140,7 @@ def clean_csv(input_file):
     return cleaned_rows
 
 
-# ============================================================
 # MAIN PROGRAM
-# ============================================================
 
 print("======================================")
 print(" URL DATASET CLEANER AND MERGER")
@@ -181,9 +174,8 @@ for i in range(number_of_files):
     all_rows.extend(rows)
 
 
-# ============================================================
+
 # WRITE MERGED DATASET
-# ============================================================
 
 output_file = input(
     "Enter the name for the merged CSV "
@@ -207,9 +199,7 @@ with open(
     writer.writerows(all_rows)
 
 
-# ============================================================
 # SUMMARY
-# ============================================================
 
 benign_count = 0
 phishing_count = 0
