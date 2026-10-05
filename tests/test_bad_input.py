@@ -80,7 +80,7 @@ class IsReadable(unittest.TestCase):
 
     def test_junk_fails(self):
         # the first three are real rows from malicious_phish.csv that used to pass
-        for url in ["WY", "ºE", "¾5092", "foo.notarealtld", "localhost", "", "a b.com"]:
+        for url in ["WY", "ºE", "¾5092", "foo.notarealtld", "localhost", "", "a b.com", "a.com/�"]:
             with self.subTest(url=url):
                 self.assertFalse(is_readable(url))
 
