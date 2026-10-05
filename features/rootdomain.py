@@ -68,7 +68,7 @@ class RootDomainHasPunycode(Feature):
     description = "Whether the Root Domain label is punycode (xn--)."
 
     def extract(self, url: str) -> bool:
-        return any(label.startswith("xn--") for label in get_root_label(url))
+        return get_root_label(url).startswith("xn--")
 
 class RootDomainDigitRatio(Feature):
     name = "root_domain_digit_ratio"
