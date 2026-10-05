@@ -47,6 +47,10 @@ class ExtractorSurvivesBadInput(unittest.TestCase):
         self.assertEqual(row["num_query_components"], 2)
         self.assertEqual(row["subdomain_count"], 1)
 
+    def test_punycode_root_domain(self):
+        self.assertTrue(features.extract_features("login.xn--pple-43d.com/a")["root_domain_has_punycode"])
+        self.assertFalse(features.extract_features("apple.xn--p1ai/a")["root_domain_has_punycode"])  # punycode TLD, plain root
+
 
 class CanonicalUrl(unittest.TestCase):
 
