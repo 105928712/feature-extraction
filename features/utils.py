@@ -33,6 +33,8 @@ def is_readable(url):
         return False
     if not url.isprintable():
         return False
+    if "�" in url:  # byte that wasn't valid UTF8, the URL is bad
+        return False
     for char in url:
         if char.isspace():
             return False
