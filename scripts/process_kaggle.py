@@ -1,13 +1,13 @@
-# process_datasets.py
+# process_kaggle.py
 # 2026 Joey Manani & Anchorfish Team
 # Dataset cleaning script
 #
-# Cleans malicious_phish.csv (url, type) into a CSV for extract_datasets.py
+# Cleans malicious_phish.csv (url, type) into a CSV for extract_features.py
 # Output is sorted by type, so shuffle before splitting
 # Turns out some blocks at the end of the file have their labels swapped, we flip them back (see below)
 #
 # Usage (from the repo root):
-#     python -m scripts.process_datasets <malicious_phish.csv> <output.csv>
+#     python -m scripts.process_kaggle <malicious_phish.csv> <output.csv>
 
 import csv
 import sys
@@ -35,7 +35,7 @@ ACTUALLY_LEGITIMATE = range(603182, 651191)
 
 def main():
     if len(sys.argv) != 3:
-        print("Usage: python -m scripts.process_datasets <malicious_phish.csv> <output.csv>")
+        print("Usage: python -m scripts.process_kaggle <malicious_phish.csv> <output.csv>")
         sys.exit(1)
 
     input_file = sys.argv[1]
