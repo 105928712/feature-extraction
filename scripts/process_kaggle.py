@@ -21,7 +21,7 @@ LABELS = {
     "malware": "Malware",
     "defacement": "Defacement",
 }
-TYPE_ORDER = ["Legitimate", "Phishing", "Malware", "Defacement"] # sort it because why not
+TYPE_ORDER = ["Legitimate", "Phishing"] #, "Malware", "Defacement"] # sort it because why not
 
 # The Kaggle file is shuffled up to row 520,330
 
