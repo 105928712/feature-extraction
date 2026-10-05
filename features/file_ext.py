@@ -3,7 +3,7 @@
 # Malicious file extension extractor
 
 from .base import Feature
-from urllib.parse import urlparse
+from .utils import split_url
 
 MALICIOUS_EXTENSIONS = frozenset({
     "exe",
@@ -34,10 +34,10 @@ class HasMaliciousFileExtension(Feature):
     description = "Whether the URL path contains a potentially malicious file extension"
 
     def extract(self, url: str) -> int:
-        parsed_url = urlparse(url)
+        parts = split_url(url)
 
         # Only examine the path, not the domain or query
-        path = parsed_url.path
+        path = parts.path if parts else ""
 
         # Get the final part of the path
         filename = path.rstrip("/").split("/")[-1]
