@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
-# Create/activate the venv and install deps. Usage: source setup.sh
-SETUP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Create/activate the venv, install deps, then download and unzip the datasets. Usage: source setup.sh
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-[ -f "$SETUP_DIR/.venv/pyvenv.cfg" ] || python3 -m venv "$SETUP_DIR/.venv" || return 1
-source "$SETUP_DIR/.venv/bin/activate" || return 1
-pip install -q -r "$SETUP_DIR/requirements.txt"
+echo "Setting up the development environment..."
+[ -f .venv/pyvenv.cfg ] || python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 
-unset SETUP_DIR
+git lfs version >/dev/null 2>&1 || echo "Git LFS is not installed, installing for you and extracting datasets"
+git lfs install
+git lfs pull
+[ -d "datasets/Final Tree" ] || unzip -q "datasets/Final Tree.zip" -d datasets
+[ -d "datasets/Extra Data" ] || unzip -q "datasets/Extra Data.zip" -d datasets
