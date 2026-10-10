@@ -1,30 +1,89 @@
 # Phishing URL Feature Extraction
 
-COS30049 - Computing Technology Innovation Project - Phishing Link Detection URL feature extraction
+COS30049 Computing Technology Innovation Project
 
-This list of features will be used to extract and separate parts of a given URL into information that can be read by a trained AI model to reach the conclusion of if the URL is safe or potentially unsafe.
+Cleans the raw URL datasets and turns each URL into the 54 features the models train on
 
 ## Installation
 
-Depending on what OS you are running, you will need to use a different command for installation:
+The datasets in `datasets/` are zips stored with Git LFS
 
-For Windows:
+**Automatic** (venv): create the environment, install the packages, download the LFS files and unzip them into `datasets/`:
+- Windows: `setup.bat` (Command Prompt) or `. .\setup.ps1` (PowerShell)
+- macOS / Linux: `source setup.sh`
+
+**Manual** (Conda):
 ```bash
-setup.bat
+conda create -n phishing-features python=3.13 -y
+conda activate phishing-features
+pip install -r requirements.txt
+git lfs install
+git lfs pull
 ```
-or
-```bash
-. .\setup.ps1
+Then unzip `datasets/Final Tree.zip` and `datasets/Extra Data.zip` inside `datasets/`
+
+## Data
+
+This repo builds the Final Tree that all three repos use. Each step's output is the next step's input:
+
+```
+├── Final Tree.zip
+├── Extra Data.zip
+├── Final Tree/
+│   ├── 1 Raw Data/          malicious_phish.csv (Kaggle), Phishing URLs.csv + URL dataset.csv (Mendeley)
+│   ├── 2. Cleaned Data/     kaggle_clean.csv, phish_clean.csv, urlds_clean.csv
+│   ├── 3. Merged Data/      cleaned.csv
+│   └── 4. Final Data/       features.csv   (what the models train on)
+└── Extra Data/              tranco_1m, tranco_processed, urlset
 ```
 
-For macOS and Linux/Unix:
-```bash
-source setup.sh
-```
+(The real folder names are longer, such as `1 Raw Data - Run These Through Cleaning Scripts`. The commands below use them in full for reproducibility)
+
+Sources: 
+
+Siddhartha, M. (2021) *Malicious URLs dataset.* Kaggle. Available at: [Malicious URLs Dataset](https://www.kaggle.com/datasets/sid321axn/malicious-urls-dataset) (Accessed: 7 September 2026). (CC0: Public Domain)
+
+KAITHOLIKKAL, JISHNU K S; B, Arthi  (2024), *Phishing URL dataset.* Mendeley Data, V1, doi: 10.17632/vfszbj9b36.1 (Accessed: 7 September 2026). (CC BY 4.0)
 
 ## Usage
 
+### Rebuild the Final Tree from the raw files
 
+Run from the repo root. Each step writes the next folder of the Final Tree. The provided Final Tree on LFS already has this structure, so this is only for reproducibility.
+
+Expects the raw dataset files to be present in the `datasets/Final Tree/1 Raw Data - Run These Through Cleaning Scripts` directory.
+
+```bash
+# 1 -> 2: clean each source into [url,type] (canonical URLs, labels unified , unreadable rows dropped)
+python -m scripts.process_kaggle "datasets/Final Tree/1 Raw Data - Run These Through Cleaning Scripts/malicious_phish.csv" "datasets/Final Tree/2. Cleaned Data - Already Processed With Cleaning Scripts/kaggle_clean.csv"
+python -m scripts.process_phishing_urls "datasets/Final Tree/1 Raw Data - Run These Through Cleaning Scripts/Phishing URLs.csv" "datasets/Final Tree/2. Cleaned Data - Already Processed With Cleaning Scripts/phish_clean.csv"
+python -m scripts.process_url_dataset "datasets/Final Tree/1 Raw Data - Run These Through Cleaning Scripts/URL dataset.csv" "datasets/Final Tree/2. Cleaned Data - Already Processed With Cleaning Scripts/urlds_clean.csv"
+
+# 2 -> 3: merge (duplicates kept once, conflicting labels dropped)
+python -m scripts.merge_datasets "datasets/Final Tree/3. Merged Data - Ran The Cleaned Data Through Merge Datasets Script/cleaned.csv" "datasets/Final Tree/2. Cleaned Data - Already Processed With Cleaning Scripts/kaggle_clean.csv" "datasets/Final Tree/2. Cleaned Data - Already Processed With Cleaning Scripts/phish_clean.csv" "datasets/Final Tree/2. Cleaned Data - Already Processed With Cleaning Scripts/urlds_clean.csv"
+
+# 3 -> 4: extract the 54 features for every url in merged data
+python -m scripts.extract_features "datasets/Final Tree/3. Merged Data - Ran The Cleaned Data Through Merge Datasets Script/cleaned.csv" "datasets/Final Tree/4. Final Data - Run Through Feature Extractor Script/features.csv"
+```
+
+`scripts/process_tranco.py` is kept for reference only because Tranco was tried as a legit source and dropped (see `data-visualisations/eda_merged.ipynb`). No need to run it.
+
+### Features for one URL
+
+```python
+import features
+from features.utils import canonical_url
+
+features.extract_features(canonical_url("http://www.paypal.com.secure-login.example.com/webscr?cmd=login"))
+```
+
+Always use `canonical_url(url)` which is in the same pipeline on how the training data was cleaned.
+
+### Tests
+
+```bash
+python -m unittest discover tests
+```
 
 ## Feature Extraction Masterlist
 
